@@ -1,7 +1,6 @@
 import os
 import timeit
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding
 from binascii import hexlify
 
@@ -22,12 +21,11 @@ for f_id in files_AES:
 
         #setup data
         data = file.read()
-        #print(f"data: {data}")
         padder = padding.PKCS7(algorithms.AES.block_size).padder()
         padded_data = padder.update(data) + padder.finalize()
         
         ##encryption setup
-        cipher = Cipher(algorithms.AES(key), modes.CBC(iv),backend=default_backend())
+        cipher = Cipher(algorithms.AES(key), modes.CBC(iv))
 
         ##encrypting
         encryptor = cipher.encryptor()
@@ -35,7 +33,6 @@ for f_id in files_AES:
         start_timer = timeit.default_timer() #timer
         encrypted_data = encryptor.update(padded_data) + encryptor.finalize()
         print(f"Time to encrypt: {(timeit.default_timer() - start_timer):.9f}")
-        #print(f"encrypted data (hex): {hexlify(encrypted_data)}")
 
         ##decrypting
         decryptor = cipher.decryptor()
@@ -43,16 +40,14 @@ for f_id in files_AES:
         start_timer = timeit.default_timer() #timer
         decrypted_padded_data = decryptor.update(encrypted_data) + decryptor.finalize()
         print(f"Time to decrypt: {(timeit.default_timer() - start_timer):.9f}")
-        #print(f"decrypted padded data (hex): {hexlify(decrypted_padded_data)}")
 
 
 
-        ##remove padding apos decrypt, para analisar se esta correto
+        '''##remove padding apos decrypt, para analisar se esta correto
         ##nao faz parte da entrega 
         unpadder = padding.PKCS7(algorithms.AES.block_size).unpadder()
         decrypted_data = unpadder.update(decrypted_padded_data) + unpadder.finalize()
-        #print(f"decrypted data: {decrypted_data}")
-
+        #print(f"decrypted data: {decrypted_data}")'''
 
 
         print(f"Done! {f_id}\n")

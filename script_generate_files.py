@@ -45,11 +45,7 @@ gerar("AES")
 
 #===================B===================
         
-
-
-
-
-
+    
 #===================C===================
         
 from cryptography.hazmat.primitives.asymmetric import rsa

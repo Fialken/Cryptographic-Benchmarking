@@ -1,6 +1,14 @@
 import os
 import random
 import string
+import timeit
+
+
+#temporario
+files_AES = ["type_AES__size_8.txt","type_AES__size_64.txt","type_AES__size_512.txt","type_AES__size_4096.txt","type_AES__size_32768.txt","type_AES__size_262144.txt","type_AES__size_2097152.txt"]
+files_SHA = ["type_SHA__size_8.txt","type_SHA__size_64.txt","type_SHA__size_512.txt","type_SHA__size_4096.txt","type_SHA__size_32768.txt","type_SHA__size_262144.txt","type_SHA__size_2097152.txt"]
+files_RSA = ["type_RSA__size_2.txt","type_RSA__size_4.txt","type_RSA__size_8.txt","type_RSA__size_16.txt","type_RSA__size_32.txt","type_RSA__size_64.txt","type_RSA__size_128.txt"]
+
 
 
 #===================A===================
@@ -31,7 +39,21 @@ def gerar(file_type):
         generate_file(file_path, size)
         print(f"Generated text file '{file_path}' with size {os.path.getsize(file_path)} bytes.")
 
-gerar("RSA")
+
+gerar("AES")
 
 
 #===================B===================
+        
+
+
+
+
+
+#===================C===================
+        
+from cryptography.hazmat.primitives.asymmetric import rsa
+private_key = rsa.generate_private_key(
+    public_exponent=65537,
+    key_size=2048,
+)

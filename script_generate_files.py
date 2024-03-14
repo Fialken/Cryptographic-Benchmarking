@@ -40,11 +40,4 @@ def gerar(file_type):
         print(f"Generated text file '{file_path}' with size {os.path.getsize(file_path)} bytes.")
 
 
-gerar("AES")
-
-        
-from cryptography.hazmat.primitives.asymmetric import rsa
-private_key = rsa.generate_private_key(
-    public_exponent=65537,
-    key_size=2048,
-)
+gerar("RSA")

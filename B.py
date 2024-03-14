@@ -10,8 +10,6 @@ files_AES = ["type_AES__size_8.txt","type_AES__size_64.txt","type_AES__size_512.
 
 key = os.urandom(32)  # 256-bit key
 iv = os.urandom(16)
-print(f"key: {hexlify(key)}")
-print(f"iv: {hexlify(iv)}\n")
 
 
 for f_id in files_AES:

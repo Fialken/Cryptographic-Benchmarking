@@ -39,4 +39,4 @@ def gerar(file_type):
         print(f"Generated text file '{file_path}' with size {os.path.getsize(file_path)} bytes.")
 
 
-gerar("RSA")
+gerar("AES")

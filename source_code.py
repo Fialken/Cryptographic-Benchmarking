@@ -1,19 +1,18 @@
 import os
 import random
 import string
-import timeit
-from binascii import hexlify
+import timeit, time
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import serialization, hashes
+from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives import padding
+from cryptography.hazmat.primitives.asymmetric import padding as padding_2
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.asymmetric import rsa
-import matplotlib.pyplot as plt
 
 #files names
 FILES_AES = ["type_AES__size_8.txt","type_AES__size_64.txt","type_AES__size_512.txt","type_AES__size_4096.txt","type_AES__size_32768.txt","type_AES__size_262144.txt","type_AES__size_2097152.txt"]
-FILES_SHA = ["type_SHA__size_8.txt","type_SHA__size_64.txt","type_SHA__size_512.txt","type_SHA__size_4096.txt","type_SHA__size_32768.txt","type_SHA__size_262144.txt","type_SHA__size_2097152.txt"]
 FILES_RSA = ["type_RSA__size_2.txt","type_RSA__size_4.txt","type_RSA__size_8.txt","type_RSA__size_16.txt","type_RSA__size_32.txt","type_RSA__size_64.txt","type_RSA__size_128.txt"]
+FILES_SHA = ["type_SHA__size_8.txt","type_SHA__size_64.txt","type_SHA__size_512.txt","type_SHA__size_4096.txt","type_SHA__size_32768.txt","type_SHA__size_262144.txt","type_SHA__size_2097152.txt"]
 
 
 
@@ -21,7 +20,8 @@ FILES_RSA = ["type_RSA__size_2.txt","type_RSA__size_4.txt","type_RSA__size_8.txt
 #=================CODE==================#
 #=======================================#
 
-#===A===#
+
+#===================A===================#
 #CODE TO GENERATE FILES#
 
 # Gera uma string aleatória de comprimento length 
@@ -60,19 +60,16 @@ def gerar(file_type, print_q: str):
     print("")
 
 
-#===B===#
-#1 para avaliar sempre os mesmos ficheiros
-#2 para avaliar com diferentes ficheiros em cada iteracao
 
+#===================B===================#
+#1 para avaliar sempre os mesmos ficheiros
+#2 para avaliar com diferentes ficheiros
 def AES(print_q: str):
     # Gera uma chave aleatória de 256 bits (32 bytes)
     # E um vetor de inicialização (IV) de 16 bytes
     # O print mostra a chave e o IV em formato hexadecimal
     key = os.urandom(32)  
     iv = os.urandom(16)
-    if print_q == 'y':
-        print(f"key: {hexlify(key)}")
-        print(f"iv: {hexlify(iv)}\n")
     num_file = 0
 
     tempos = []
@@ -114,9 +111,9 @@ def AES(print_q: str):
                 if i > 10:
                     time_decr += (timeit.default_timer() - start_timer)*10e6
             
-            tempos.append([time_encr/n_iteracoes, time_decr/n_iteracoes])
+            tempos.append([time_encr/(n_iteracoes-10), time_decr/(n_iteracoes-10)])
             if(print_q == 'y'):
-                print(f"Media do tempo para encryptar: {time_encr/n_iteracoes:.3f} microseconds\nMedia do tempo para decryptar: {time_decr/n_iteracoes:.3f} microseconds")
+                print(f"Media do tempo para encryptar: {time_encr/(n_iteracoes-10):.3f} microseconds\nMedia do tempo para decryptar: {time_decr/(n_iteracoes-10):.3f} microseconds")
                 print(f"Done! {f_id}\n")
         num_file += 1
     return tempos
@@ -131,27 +128,206 @@ def AES_diff_files():
             tempo_total[j][0] += tempos[j][0]
             tempo_total[j][1] += tempos[j][1]
     i = 0
-    print(f"Foram gerado {total} vezes ficheiros diferentes\n")
+    print(f"Foram gerados {total} vezes ficheiros diferentes\n")
     for f in FILES_AES:
         print(f"Ficheiro {f}\nMedia do tempo para encryptar: {tempo_total[i][0]/total:.3f} microseconds\nMedia do tempo para decryptar: {tempo_total[i][1]/total:.3f} microseconds\n")    
         i += 1
+    return tempo_total
+
+
+#===================C===================#
+#funcoes auxiliares
+def generate_keypair():
+    private_key = rsa.generate_private_key(
+        public_exponent=65537,
+        key_size=2048,
+        backend=default_backend()
+    )
+    public_key = private_key.public_key()
+    return private_key, public_key
+
+def encrypt(message, public_key):
+    ciphertext = public_key.encrypt(
+        message,
+        padding_2.OAEP(
+            mgf=padding_2.MGF1(algorithm=hashes.SHA256()),
+            algorithm=hashes.SHA256(),
+            label=None
+        )
+    )
+    return ciphertext
+
+def decrypt(ciphertext, private_key):
+    plaintext = private_key.decrypt(
+        ciphertext,
+        padding_2.OAEP(
+            mgf=padding_2.MGF1(algorithm=hashes.SHA256()),
+            algorithm=hashes.SHA256(),
+            label=None
+        )
+    )
+    return plaintext
+
+#1 para avaliar sempre os mesmos ficheiros
+#2 para avaliar com diferentes ficheiros
+def RSA(print_q: str):
+    # Generate key pair
+    private_key, public_key = generate_keypair()
+    tempos = []
+
+    for f_id in FILES_RSA:
+        num_file = 0
+
+        with open(f_id, 'rb') as file:
+            time_decr = time_encr = 0
+            plaintext = file.read()
+
+            if num_file < 3:
+                n_iteracoes = 500
+            else: n_iteracoes = 100
+            
+            if(print_q == 'y'):
+                print(f"Starting! {f_id}")
+            
+            for i in range(n_iteracoes):
+                # Measure encryption time
+                start_time = timeit.default_timer()
+                encrypted_message = encrypt(plaintext, public_key)
+                if i > 10:
+                    time_encr += (timeit.default_timer() - start_time)*10e6
+
+                # Measure decryption time
+                start_time = timeit.default_timer()
+                decrypted_message = decrypt(encrypted_message, private_key)
+                if i > 10:
+                    time_decr += (timeit.default_timer() - start_time)*10e6
+
+
+            tempos.append([time_encr/(n_iteracoes-10), time_decr/(n_iteracoes-10)])
+            # Print results
+            if(print_q == 'y'):
+                print(f"Media do tempo para encryptar: {time_encr/(n_iteracoes-10):.3f} microseconds\nMedia do tempo para decryptar: {time_decr/(n_iteracoes-10):.3f} microseconds")
+                print(f"Done! {f_id}\n")
+
+        num_file += 1
+    return tempos
+
+def RSA_diff_files():
+    total = 10 
+    tempo_total = [[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0]]
+    for i in range(total):
+        gerar("RSA",'n')
+        tempos = RSA('n')
+        for j in range (len(tempos)):
+            tempo_total[j][0] += tempos[j][0]
+            tempo_total[j][1] += tempos[j][1]
+    i = 0
+    print(f"Foram gerados {total} vezes ficheiros diferentes\n")
+    for f in FILES_AES:
+        print(f"Ficheiro {f}\nMedia do tempo para encryptar: {tempo_total[i][0]/total:.3f} microseconds\nMedia do tempo para decryptar: {tempo_total[i][1]/total:.3f} microseconds\n")    
+        i += 1
+    return tempo_total
+
+
+#===================D===================#
+        
+
+def SHA256(print_q: str): 
+    tempos = []
+    n_iteracoes = 500
+    num_file = 0
+
+    for f_id in FILES_SHA:
+        time_taken = 0
+        if(print_q == 'y'):
+            print(f"Starting! {f_id}")
+        
+        if num_file < 3:
+            n_iteracoes = 500
+        else: n_iteracoes = 100
+
+        with open(f_id, 'rb') as file:
+            plaintext = file.read()
+
+            for i in range(n_iteracoes):
+                digest = hashes.Hash(hashes.SHA256())
+                #apply algoritm
+                start_time = timeit.default_timer()
+                digest.update(plaintext) 
+
+                if i > 10:
+                    time_taken += (timeit.default_timer() - start_time)*10e6
+
+            tempos.append(time_taken/(n_iteracoes-10))
+            digest.finalize()
+
+            if(print_q == 'y'):
+                print(f"Media do tempo para aplicar algoritmo: {time_taken/(n_iteracoes-10):.3f} microseconds")
+                print(f"Done! {f_id}\n")
+
+        num_file +=1 
+
+    return tempos
+
+def SHA256_diff_files():
+    total = 10 
+    tempo_total = [0,0,0,0,0,0,0]
+    for i in range(total):
+        gerar("SHA",'n')
+        tempos = SHA256('n')
+        for j in range (len(tempos)):
+            tempo_total[j] += tempos[j]
+    i = 0
+    print(f"Foram gerados {total} vezes ficheiros diferentes\n")
+    for f in FILES_SHA:
+        print(f"Ficheiro {f}\nMedia do tempo para aplicar algoritmo: {tempo_total[i]/total:.3f} microseconds\n")
+        i += 1
+    return tempo_total
+
+#===============Main Funcion============#
 
 def main():
-    print("A criar todos os ficheiros necessarios:")
-    #gerar("AES",'y')
-    #gerar("SHA",'y')
-    #gerar("RSA",'y')
+    print("A criar todos os ficheiros necessarios:\n")
+    gerar("AES",'y')
+    gerar("SHA",'y')
+    gerar("RSA",'y')
 
-    what_to_do = 1 # 1 -> AES | 2 -> RSA | 3 -> SHA | -1 -> finish
+    what_to_do = 0 # 1 -> AES | 2 -> RSA | 3 -> SHA | -1 -> end
     while what_to_do != -1:
+        print(f"\n\n1: Benchmark for AES (point B)")
+        print(f"2: Benchmark for RSA (point C)")
+        print(f"3: Benchmark for SHA (point D)")
+        print(f"-1: to end\n")
+        what_to_do = int(input("Escolha a opcao: "))
+
 
         if what_to_do == 1:
+            print(f"\nBenchmark for AES")
             qual = int(input(f"1: Usar sempre os mesmos ficheiro\n2: Usar diferentes ficheiros\nEscolha: "))
+            print(f"")
             if qual == 1:
                 AES('y')    
             else: AES_diff_files()    
+            time.sleep(0.5)
 
-        what_to_do = -1
+        elif what_to_do == 2:
+            print(f"\nBenchmark for RSA")
+            qual = int(input(f"1: Usar sempre os mesmos ficheiro\n2: Usar diferentes ficheiros\nEscolha: "))
+            print(f"")
+            if qual == 1:
+                RSA('y')  
+            else: RSA_diff_files()    
+            time.sleep(0.5)
+
+        elif what_to_do == 3:
+            print(f"\nBenchmark for SHA")
+            qual = int(input(f"1: Usar sempre os mesmos ficheiro\n2: Usar diferentes ficheiros\nEscolha: "))
+            print(f"")
+            if qual == 1:
+                SHA256('y')  
+            else: SHA256_diff_files() 
+            time.sleep(0.5)
+
 
 if __name__ == "__main__":
     main()

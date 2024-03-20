@@ -11,8 +11,8 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 
 #files names
 FILES_AES = ["type_AES__size_8.txt","type_AES__size_64.txt","type_AES__size_512.txt","type_AES__size_4096.txt","type_AES__size_32768.txt","type_AES__size_262144.txt","type_AES__size_2097152.txt"]
-FILES_RSA = ["type_RSA__size_2.txt","type_RSA__size_4.txt","type_RSA__size_8.txt","type_RSA__size_16.txt","type_RSA__size_32.txt","type_RSA__size_64.txt","type_RSA__size_128.txt"]
 FILES_SHA = ["type_SHA__size_8.txt","type_SHA__size_64.txt","type_SHA__size_512.txt","type_SHA__size_4096.txt","type_SHA__size_32768.txt","type_SHA__size_262144.txt","type_SHA__size_2097152.txt"]
+FILES_RSA = ["type_RSA__size_2.txt","type_RSA__size_4.txt","type_RSA__size_8.txt","type_RSA__size_16.txt","type_RSA__size_32.txt","type_RSA__size_64.txt","type_RSA__size_128.txt"]
 
 
 
@@ -27,7 +27,8 @@ FILES_SHA = ["type_SHA__size_8.txt","type_SHA__size_64.txt","type_SHA__size_512.
 # Gera uma string aleatória de comprimento length 
 # Random.choice seleciona caracteres aleatórios 
 def generate_text(length):
-    return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(length))
+    characters = string.ascii_uppercase + string.ascii_lowercase + string.digits + string.punctuation
+    return ''.join(random.choice(characters) for _ in range(length))
 
 # Gera um arquivo de texto no caminho especificado com o tamanho em bytes fornecido (argumentos da função)
 # Chama a função generate_text para gerar o texto a ser escrito no arquivo e depois escreve esse texto no arquivo
@@ -58,7 +59,6 @@ def gerar(file_type, print_q: str):
         if print_q == 'y':
             print(f"Generated text file '{file_path}' with size {os.path.getsize(file_path)} bytes.")
     print("")
-
 
 
 #===================B===================#
@@ -174,17 +174,14 @@ def RSA(print_q: str):
     # Generate key pair
     private_key, public_key = generate_keypair()
     tempos = []
+    n_iteracoes = 500
 
     for f_id in FILES_RSA:
-        num_file = 0
+
 
         with open(f_id, 'rb') as file:
             time_decr = time_encr = 0
             plaintext = file.read()
-
-            if num_file < 3:
-                n_iteracoes = 500
-            else: n_iteracoes = 100
             
             if(print_q == 'y'):
                 print(f"Starting! {f_id}")
@@ -209,7 +206,6 @@ def RSA(print_q: str):
                 print(f"Media do tempo para encryptar: {time_encr/(n_iteracoes-10):.3f} microseconds\nMedia do tempo para decryptar: {time_decr/(n_iteracoes-10):.3f} microseconds")
                 print(f"Done! {f_id}\n")
 
-        num_file += 1
     return tempos
 
 def RSA_diff_files():
@@ -223,15 +219,13 @@ def RSA_diff_files():
             tempo_total[j][1] += tempos[j][1]
     i = 0
     print(f"Foram gerados {total} vezes ficheiros diferentes\n")
-    for f in FILES_AES:
+    for f in FILES_RSA:
         print(f"Ficheiro {f}\nMedia do tempo para encryptar: {tempo_total[i][0]/total:.3f} microseconds\nMedia do tempo para decryptar: {tempo_total[i][1]/total:.3f} microseconds\n")    
         i += 1
     return tempo_total
 
 
 #===================D===================#
-        
-
 def SHA256(print_q: str): 
     tempos = []
     n_iteracoes = 500
@@ -283,6 +277,7 @@ def SHA256_diff_files():
         print(f"Ficheiro {f}\nMedia do tempo para aplicar algoritmo: {tempo_total[i]/total:.3f} microseconds\n")
         i += 1
     return tempo_total
+
 
 #===============Main Funcion============#
 

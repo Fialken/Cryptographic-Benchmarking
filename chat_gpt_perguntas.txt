@@ -1,0 +1,13 @@
+B.
+(baseamo nos no exercicio 3 da ficha pratica 2 para encryptar)
+
+(para sabermos decriptar)
+Q: using cryptography module from python, how do i decrypt a message that was encrypted with AES algoritm and CBC mode
+
+
+C.
+Q: Using the python module cryptography can u write a function for RSA encryption and decryption with a key of size 2048 bits
+
+
+D.
+Q: use cryptography module in python to implement an algoritm to generate hash with SHA-256 to a set file

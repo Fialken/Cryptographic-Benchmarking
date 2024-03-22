@@ -1,5 +1,6 @@
 -Este ficheiro serve de orientação para o que cada ficheiro representa.
 
+é necessário ter os modulos cryptography, timeit na sua versao mais recente há data de 20/3/2024
 
 
 -"b_c_d.py" tem a implementação dos pontos B) C) e D) respetivamente, mas não inclui a alteração para automatizar os resultados.
@@ -19,4 +20,4 @@
 								 	testar com diferentes ficheiros (escolha 2)
 
 
-- "relatorio" é o relatório
+- "Segurança e privcidade relatorio.pdf" é o relatório

@@ -12,6 +12,7 @@ FILES_SHA = ["type_SHA__size_8.txt","type_SHA__size_64.txt","type_SHA__size_512.
 FILES_RSA = ["type_RSA__size_2.txt","type_RSA__size_4.txt","type_RSA__size_8.txt","type_RSA__size_16.txt","type_RSA__size_32.txt","type_RSA__size_64.txt","type_RSA__size_128.txt"]
 
 
+
 #===================B===================#
 def AES():
     # Gera uma chave aleatória de 256 bits (32 bytes)
@@ -59,6 +60,7 @@ def AES():
             tempos.append([time_encr/(n_iteracoes-10), time_decr/(n_iteracoes-10)])
         num_file += 1
     return tempos
+
 
 
 #===================C===================#
@@ -121,6 +123,7 @@ def RSA():
             tempos.append([time_encr/(n_iteracoes-10), time_decr/(n_iteracoes-10)])
 
     return tempos
+
 
 
 #===================D===================#

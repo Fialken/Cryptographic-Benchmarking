@@ -119,7 +119,7 @@ def AES(print_q: str):
     return tempos
 
 def AES_diff_files():
-    total = 10 
+    total = 25
     tempo_total = [[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0]]
     for i in range(total):
         gerar("AES",'n')
@@ -136,6 +136,8 @@ def AES_diff_files():
 
 
 #===================C===================#
+#1 para avaliar sempre os mesmos ficheiros
+#2 para avaliar com diferentes ficheiros
 #funcoes auxiliares
 def generate_keypair():
     private_key = rsa.generate_private_key(
@@ -168,8 +170,7 @@ def decrypt(ciphertext, private_key):
     )
     return plaintext
 
-#1 para avaliar sempre os mesmos ficheiros
-#2 para avaliar com diferentes ficheiros
+
 def RSA(print_q: str):
     # Generate key pair
     private_key, public_key = generate_keypair()
@@ -209,7 +210,7 @@ def RSA(print_q: str):
     return tempos
 
 def RSA_diff_files():
-    total = 10 
+    total = 25 
     tempo_total = [[0,0],[0,0],[0,0],[0,0],[0,0],[0,0],[0,0]]
     for i in range(total):
         gerar("RSA",'n')
@@ -226,6 +227,8 @@ def RSA_diff_files():
 
 
 #===================D===================#
+#1 para avaliar sempre os mesmos ficheiros
+#2 para avaliar com diferentes ficheiros
 def SHA256(print_q: str): 
     tempos = []
     n_iteracoes = 500
@@ -264,7 +267,7 @@ def SHA256(print_q: str):
     return tempos
 
 def SHA256_diff_files():
-    total = 10 
+    total = 25 
     tempo_total = [0,0,0,0,0,0,0]
     for i in range(total):
         gerar("SHA",'n')
